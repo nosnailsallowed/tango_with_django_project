@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 {%  load staticfiles %}
 
@@ -11,46 +10,37 @@
     <body>
 
         <h1>Rango says...</h1>
+        <div>hey there partner!</div>
 
         <div>
-            hey there partner!<br />
-            <strong>{{  boldmessage }}</strong><br />
+            <h2>Most Liked Categories</h2>
+            {% if categories %}
+                <ul>
+                   {% for category in categories %}
+                    <li>
+                    <a href="/rango/category/{{ category.slug }}">{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div>
+            <h2>Most Viewed Pages</h2>
+            {% if pages %}
+                <ul>
+                    {% for page in pages %}
+                       <li><a href="{{ page.url }}">{{ page.title }}</a> </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
 
         <div>
             <a href="/rango/about/">About</a><br />
             <img src="{%  static "images/rango.jpg"%}"
-                 alt="Picture of Rango" />
+                alt="Picture of Rango" />
         </div>
 
     </body>
-
-=======
-<!DOCTYPE html>
-{%  load staticfiles %}    <!why is this showing up on the webpage??>
-
-<html>
-
-    <head>
-        <title>Rango</title>
-    </head>
-
-    <body>
-
-        <h1>Rango says...</h1>
-
-        <div>
-            hey there partner!<br />
-            <strong>{{  boldmessage }}</strong><br />    <!this is not
-        </div>
-
-        <div>
-            <a href="/rango/about">About</a><br />
-            <img src="{%  static "images/rango.jpg"%}"
-                 alt="Picture of Rango" />
-        </div>
-
-    </body>
-
->>>>>>> 3ff2dfde0f87c58d4c2d510f8e463658dda9e569
 </html>

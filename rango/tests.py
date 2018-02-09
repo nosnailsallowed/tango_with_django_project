@@ -1,486 +1,169 @@
-<<<<<<< HEAD
-from django.test import TestCase
-
-from django.test import TestCase
-from django.core.urlresolvers import reverse
-from django.contrib.staticfiles import finders
-
-
-# Thanks to Enzo Roiz https://github.com/enzoroiz who made these tests during an internship with us
-
-class GeneralTests(TestCase):
-    def test_serving_static_files(self):
-        # If using static media properly result is not NONE once it finds rango.jpg
-        result = finders.find('images/rango.jpg')
-        self.assertIsNotNone(result)
-
-
-class IndexPageTests(TestCase):
-    def test_index_contains_hello_message(self):
-        # Check if there is the message 'Rango Says'
-        # Chapter 4
-        response = self.client.get(reverse('index'))
-        self.assertIn(b'Rango says', response.content)
-
-    def test_index_using_template(self):
-        # Check the template used to render index page
-        # Chapter 4
-        response = self.client.get(reverse('index'))
-        self.assertTemplateUsed(response, 'rango/index.html')
-
-    def test_rango_picture_displayed(self):
-        # Check if is there an image called 'rango.jpg' on the index page
-        # Chapter 4
-        response = self.client.get(reverse('index'))
-        self.assertIn(b'img src="/static/images/rango.jpg', response.content)
-
-    def test_index_has_title(self):
-        # Check to make sure that the title tag has been used
-        # And that the template contains the HTML from Chapter 4
-        response = self.client.get(reverse('index'))
-        self.assertIn(b'<title>', response.content)
-        self.assertIn(b'</title>', response.content)
-
-
-class AboutPageTests(TestCase):
-    def test_about_contains_create_message(self):
-        # Check if in the about page is there - and contains the specified message
-        # Exercise from Chapter 4
-        response = self.client.get(reverse('about'))
-        self.assertIn(b'This tutorial has been put together by', response.content)
-
-    def test_about_contain_image(self):
-        # Check if is there an image on the about page
-        # Chapter 4
-        response = self.client.get(reverse('about'))
-        self.assertIn(b'img src="/media/', response.content)
-
-    def test_about_using_template(self):
-        # Check the template used to render index page
-        # Exercise from Chapter 4
-        response = self.client.get(reverse('about'))
-
-        self.assertTemplateUsed(response, 'rango/about.html')
-
-
-class ModelTests(TestCase):
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    def get_category(self, name):
-
-        from rango.models import Category
-        try:
-            cat = Category.objects.get(name=name)
-        except Category.DoesNotExist:
-            cat = None
-        return cat
-
-    def test_python_cat_added(self):
-        cat = self.get_category('Python')
-        self.assertIsNotNone(cat)
-
-    def test_python_cat_with_views(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.views, 128)
-
-    def test_python_cat_with_likes(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.likes, 64)
-
-
-class Chapter4ViewTests(TestCase):
-    def test_index_contains_hello_message(self):
-        # Check if there is the message 'hello world!'
-        response = self.client.get(reverse('index'))
-        self.assertIn('Rango says', response.content)
-
-    def test_does_index_contain_img(self):
-        # Check if the index page contains an img
-        response = self.client.get(reverse('index'))
-        self.assertIn('img', response.content)
-
-    def test_about_using_template(self):
-        # Check the template used to render index page
-        # Exercise from Chapter 4
-        response = self.client.get(reverse('about'))
-
-        self.assertTemplateUsed(response, 'rango/about.html')
-
-    def test_does_about_contain_img(self):
-        # Check if in the about page contains an image
-        response = self.client.get(reverse('about'))
-        self.assertIn('img', response.content)
-
-    def test_about_contains_create_message(self):
-        # Check if in the about page contains the message from the exercise
-        response = self.client.get(reverse('about'))
-        self.assertIn('This tutorial has been put together by', response.content)
-
-
-class Chapter5ViewTests(TestCase):
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    def get_category(self, name):
-
-        from rango.models import Category
-        try:
-            cat = Category.objects.get(name=name)
-        except Category.DoesNotExist:
-            cat = None
-        return cat
-
-    def test_python_cat_added(self):
-        cat = self.get_category('Python')
-        self.assertIsNotNone(cat)
-
-    def test_python_cat_with_views(self):
-        cat = self.get_category('Python')
-
-        self.assertEquals(cat.views, 128)
-
-    def test_python_cat_with_likes(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.likes, 64)
-
-    def test_view_has_title(self):
-        response = self.client.get(reverse('index'))
-
-        # Check title used correctly
-        self.assertIn('<title>', response.content)
-        self.assertIn('</title>', response.content)
-
-    # Need to add tests to:
-    # check admin interface - is it configured and set up
-
-    def test_admin_interface_page_view(self):
-        from admin import PageAdmin
-        self.assertIn('category', PageAdmin.list_display)
-        self.assertIn('url', PageAdmin.list_display)
-
-
-class Chapter6ViewTests(TestCase):
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    # are categories displayed on index page?
-
-    # does the category model have a slug field?
-
-
-    # test the slug field works..
-    def test_does_slug_field_work(self):
-        from rango.models import Category
-        cat = Category(name='how do i create a slug in django')
-        cat.save()
-        self.assertEqual(cat.slug, 'how-do-i-create-a-slug-in-django')
-
-        # test category view does the page exist?
-
-
-        # test whether you can navigate from index to a category page
-
-
-        # test does index page contain top five pages?
-
-        # test does index page contain the words "most liked" and "most viewed"
-
-        # test does category page contain a link back to index page?
-
-
-class Chapter7ViewTests(TestCase):
-    def setUp(self):
-        try:
-            from forms import PageForm
-            from forms import CategoryForm
-
-        except ImportError:
-            print('The module forms does not exist')
-        except NameError:
-            print('The class PageForm does not exist or is not correct')
-        except:
-            print('Something else went wrong :-(')
-
-    pass
-    # test is there a PageForm in rango.forms
-
-    # test is there a CategoryForm in rango.forms
-
-    # test is there an add page page?
-
-    # test is there an category page?
-
-
-    # test if index contains link to add category page
-    # <a href="/rango/add_category/">Add a New Category</a><br />
-
-
-=======
-from django.test import TestCase
-
-from django.test import TestCase
-from django.core.urlresolvers import reverse
-from django.contrib.staticfiles import finders
-
-
-# Thanks to Enzo Roiz https://github.com/enzoroiz who made these tests during an internship with us
-
-class GeneralTests(TestCase):
-    def test_serving_static_files(self):
-        # If using static media properly result is not NONE once it finds rango.jpg
-        result = finders.find('images/rango.jpg')
-        self.assertIsNotNone(result)
-
-
-class IndexPageTests(TestCase):
-    def test_index_contains_hello_message(self):
-        # Check if there is the message 'Rango Says'
-        # Chapter 4
-        response = self.client.get(reverse('index'))
-        self.assertIn(b'Rango says', response.content)
-
-    def test_index_using_template(self):
-        # Check the template used to render index page
-        # Chapter 4
-        response = self.client.get(reverse('index'))
-        self.assertTemplateUsed(response, 'rango/index.html')
-
-    def test_rango_picture_displayed(self):
-        # Check if is there an image called 'rango.jpg' on the index page
-        # Chapter 4
-        response = self.client.get(reverse('index'))
-        self.assertIn(b'img src="/static/images/rango.jpg', response.content)
-
-    def test_index_has_title(self):
-        # Check to make sure that the title tag has been used
-        # And that the template contains the HTML from Chapter 4
-        response = self.client.get(reverse('index'))
-        self.assertIn(b'<title>', response.content)
-        self.assertIn(b'</title>', response.content)
-
-
-class AboutPageTests(TestCase):
-    def test_about_contains_create_message(self):
-        # Check if in the about page is there - and contains the specified message
-        # Exercise from Chapter 4
-        response = self.client.get(reverse('about'))
-        self.assertIn(b'This tutorial has been put together by', response.content)
-
-    def test_about_contain_image(self):
-        # Check if is there an image on the about page
-        # Chapter 4
-        response = self.client.get(reverse('about'))
-        self.assertIn(b'img src="/media/', response.content)
-
-    def test_about_using_template(self):
-        # Check the template used to render index page
-        # Exercise from Chapter 4
-        response = self.client.get(reverse('about'))
-
-        self.assertTemplateUsed(response, 'rango/about.html')
-
-
-class ModelTests(TestCase):
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    def get_category(self, name):
-
-        from rango.models import Category
-        try:
-            cat = Category.objects.get(name=name)
-        except Category.DoesNotExist:
-            cat = None
-        return cat
-
-    def test_python_cat_added(self):
-        cat = self.get_category('Python')
-        self.assertIsNotNone(cat)
-
-    def test_python_cat_with_views(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.views, 128)
-
-    def test_python_cat_with_likes(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.likes, 64)
-
-
-class Chapter4ViewTests(TestCase):
-    def test_index_contains_hello_message(self):
-        # Check if there is the message 'hello world!'
-        response = self.client.get(reverse('index'))
-        self.assertIn('Rango says', response.content)
-
-    def test_does_index_contain_img(self):
-        # Check if the index page contains an img
-        response = self.client.get(reverse('index'))
-        self.assertIn('img', response.content)
-
-    def test_about_using_template(self):
-        # Check the template used to render index page
-        # Exercise from Chapter 4
-        response = self.client.get(reverse('about'))
-
-        self.assertTemplateUsed(response, 'rango/about.html')
-
-    def test_does_about_contain_img(self):
-        # Check if in the about page contains an image
-        response = self.client.get(reverse('about'))
-        self.assertIn('img', response.content)
-
-    def test_about_contains_create_message(self):
-        # Check if in the about page contains the message from the exercise
-        response = self.client.get(reverse('about'))
-        self.assertIn('This tutorial has been put together by', response.content)
-
-
-class Chapter5ViewTests(TestCase):
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    def get_category(self, name):
-
-        from rango.models import Category
-        try:
-            cat = Category.objects.get(name=name)
-        except Category.DoesNotExist:
-            cat = None
-        return cat
-
-    def test_python_cat_added(self):
-        cat = self.get_category('Python')
-        self.assertIsNotNone(cat)
-
-    def test_python_cat_with_views(self):
-        cat = self.get_category('Python')
-
-        self.assertEquals(cat.views, 128)
-
-    def test_python_cat_with_likes(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.likes, 64)
-
-    def test_view_has_title(self):
-        response = self.client.get(reverse('index'))
-
-        # Check title used correctly
-        self.assertIn('<title>', response.content)
-        self.assertIn('</title>', response.content)
-
-    # Need to add tests to:
-    # check admin interface - is it configured and set up
-
-    def test_admin_interface_page_view(self):
-        from admin import PageAdmin
-        self.assertIn('category', PageAdmin.list_display)
-        self.assertIn('url', PageAdmin.list_display)
-
-
-class Chapter6ViewTests(TestCase):
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    # are categories displayed on index page?
-
-    # does the category model have a slug field?
-
-
-    # test the slug field works..
-    def test_does_slug_field_work(self):
-        from rango.models import Category
-        cat = Category(name='how do i create a slug in django')
-        cat.save()
-        self.assertEqual(cat.slug, 'how-do-i-create-a-slug-in-django')
-
-        # test category view does the page exist?
-
-
-        # test whether you can navigate from index to a category page
-
-
-        # test does index page contain top five pages?
-
-        # test does index page contain the words "most liked" and "most viewed"
-
-        # test does category page contain a link back to index page?
-
-
-class Chapter7ViewTests(TestCase):
-    def setUp(self):
-        try:
-            from forms import PageForm
-            from forms import CategoryForm
-
-        except ImportError:
-            print('The module forms does not exist')
-        except NameError:
-            print('The class PageForm does not exist or is not correct')
-        except:
-            print('Something else went wrong :-(')
-
-    pass
-    # test is there a PageForm in rango.forms
-
-    # test is there a CategoryForm in rango.forms
-
-    # test is there an add page page?
-
-    # test is there an category page?
-
-
-    # test if index contains link to add category page
-    # <a href="/rango/add_category/">Add a New Category</a><br />
-
-
->>>>>>> 3ff2dfde0f87c58d4c2d510f8e463658dda9e569
-    # test if the add_page.html template exists.
+# How to run:
+# python run_tests.py -u https://github.com/<repository url> -s <student name> -d <date of deadline as YYYY-MM-DD>
+
+__author__ = 'Gerardo Aragon, David Manlove'
+
+import os, subprocess, shutil
+#import config_file_nolive as cf
+import errno, os, stat
+import json
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# From: http://stackoverflow.com/questions/1213706/what-user-do-python-scripts-run-as-in-windows
+def handleRemoveReadonly(func, path, exc):
+  excvalue = exc[1]
+  if func in (os.rmdir, os.remove) and excvalue.errno == errno.EACCES:
+      os.chmod(path, stat.S_IRWXU| stat.S_IRWXG| stat.S_IRWXO) # 0777
+      func(path)
+  else:
+      raise
+
+def generate_file_list(test_cases):
+    '''
+        Helper function to generate a file list of the test set
+    '''
+
+    out = ['decorators.py', 'test_utils.py']
+    for ch in test_cases:
+        out.append('tests_' + ch + '.py')
+
+    return out
+
+def runtests(in_tests, in_errors):
+    '''
+    Function that runs tests given that a test has not passed
+    '''
+    out_tests = in_tests
+    out_errors = in_errors
+    for ch in in_tests:
+        for key in in_tests[ch]:
+            if in_tests[ch][key] is False:
+                temp_test = 'rango.tests_' + ch + '.' + key
+                print(temp_test)
+                process = subprocess.Popen(['python', 'manage.py', 'test', temp_test], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out, err = process.communicate()
+                p_status = process.wait()
+                out = out.decode('utf-8')
+                try:
+                    err = err.decode('utf-8')
+                except:
+                    err = str(err)
+                if 'error' in err.lower() or 'errors' in err.lower() or 'Traceback' in err or 'Errno' in err:
+                    print('++ FAILED!')
+                    out_errors[key] = temp_test + '\n' + err
+                else:
+                    print('++PASSED!')
+                    out_tests[ch][key] = True
+                    out_errors[key] = None
+
+    return out_tests, out_errors
+
+
+    with open(os.path.join(dir_student, 'commits.txt'), 'w') as fp:
+        fp.write(str(len(commits)))
+        fp.write('\n')
+
+    with open(os.path.join(dir_student, 'report_errors.txt'), 'w') as fp:
+        fp.write("It seems your github repository is not about Rango: "+url_git)
+        fp.write('===========================================================================\n\n\n')
+
+    working_dir = ''
+    for root, dirs, files in os.walk("."):
+        for name in files:
+            if 'urls.py' == name:
+                working_dir = os.path.dirname(os.path.abspath(root))
+                break
+
+    print("Project dir: " + working_dir)
+    assert(os.path.isdir(os.path.abspath(working_dir + '/rango')))
+
+    with open(os.path.join(dir_student, 'report_errors.txt'), 'w') as fp:
+        fp.write("I found errors while running the automated tests in github repository: "+url_git)
+        fp.write('===========================================================================\n\n\n')
+
+    # Iterate over commits and run tests
+    for c in commits:
+        os.chdir(os.path.join(BASE_DIR, TEMP_DIR))
+        ret = subprocess.call(GIT_CHKOUT + " " + c, shell=True)
+        assert(ret == 0)
+
+        working_dir = ''
+        for root, dirs, files in os.walk("."):
+            for name in files:
+                if 'manage.py' == name:
+                    working_dir = os.path.abspath(root)
+                    break
+
+        print(working_dir)
+
+        # RUN TESTS HERE!!!!
+        if os.path.isdir(os.path.abspath(working_dir + '/rango')):
+            os.chdir(working_dir)
+            try:
+                shutil.rmtree(working_dir + '/rango/migrations', ignore_errors=False, onerror=handleRemoveReadonly)
+                #os.system("rmdir " + os.path.join(BASE_DIR, TEMP_DIR) + " /s /q")
+                os.remove("db.sqlite3")
+            except:
+                print("Couldn't delete db.sqlite3 and migrations folder")
+            try:
+                subprocess.call('python manage.py makemigrations rango')
+            except:
+                try:
+                    subprocess.call('python manage.py makemigrations')
+                except:
+                    print("Error while making migrations rango!")
+            try:
+                subprocess.call('python manage.py migrate')
+            except:
+                print("Error while migrating rango!")
+            for each in test_files:
+                shutil.copyfile(os.path.join(BASE_DIR, each), os.path.join(working_dir , 'rango', each))
+
+
+            test_cases, error_in_tests = runtests(test_cases, error_in_tests)
+
+        # Discard everything
+        os.chdir(os.path.join(BASE_DIR, TEMP_DIR))
+        ret = subprocess.call(GIT_ADD, shell=True)
+        assert(ret == 0)
+        ret = subprocess.call(GIT_STASH, shell=True)
+        ret = subprocess.call(GIT_STASH_DROP, shell=True)
+        ret = subprocess.call(GIT_CHKOUT_MASTER, shell=True)
+        assert(ret == 0)
+    ## -------
+    os.chdir(BASE_DIR)
+
+    with open(os.path.join(dir_student, 'results.json'), 'w') as fp:
+        json.dump(test_cases, fp, indent=4)
+
+    with open(os.path.join(dir_student, 'report_errors.txt'), 'w') as fp:
+        for each in error_in_tests:
+            if error_in_tests[each] is not None:
+                fp.write(error_in_tests[each])
+                fp.write('===========================================================================\n\n\n')
+
+    # with open(os.path.join(dir_student, 'report_errors.txt'), 'w') as fp:
+    #     for each in error_in_tests:
+    #         fp.write(each)
+    #         fp.write('===========================================================================\n\n\n')
+
+    #shutil.rmtree(os.path.join(BASE_DIR, TEMP_DIR), ignore_errors=False, onerror=handleRemoveReadonly)
+    os.system("rmdir " + os.path.join(BASE_DIR, TEMP_DIR) + " /s /q")
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-u", "--url", help="git repository where tests should run")
+    parser.add_argument("-s", "--student", help="student number")
+    parser.add_argument("-d", "--deadline", help="deadline")
+    args = parser.parse_args()
+
+    if args.url is not None and args.student is not None and args.deadline is not None:
+        #try:
+        main(args.url, args.student, args.deadline)
+        #except Exception as e:
+        #    print(e)
+    else:
+        raise BaseException("url, student number and deadline are required!!. Type 'python main_script.py -h' for further help")

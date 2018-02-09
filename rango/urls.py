@@ -1,16 +1,9 @@
-<<<<<<< HEAD
 from django.conf.urls import url
 from rango import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^about/$', views.about, name='about')
+    url(r'^about/$', views.about, name='about'),
+    url(r'^category/(?P<category_name_slug>[\w\-]+)/$',
+        views.show_category, name='show_category'),
 ]
-=======
-from django.conf.urls import url
-from rango import views
-
-urlpatterns = [
-    url(r'^$', views.index, name='index'),
-]
->>>>>>> 3ff2dfde0f87c58d4c2d510f8e463658dda9e569
